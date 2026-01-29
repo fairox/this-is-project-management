@@ -25,19 +25,6 @@ function App() {
         <Route path="/timesheets" element={<Timesheets />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-
-      {/* Temporary Seeding Trigger */}
-      <div style={{ position: 'fixed', bottom: '10px', right: '10px', zIndex: 9999 }}>
-        <button
-          onClick={async () => {
-            const { seedProjects } = await import("./utils/seedProjects");
-            seedProjects();
-          }}
-          style={{ padding: '5px 10px', background: 'red', color: 'white', border: 'none', borderRadius: '5px', opacity: 0.5 }}
-        >
-          Seed Data
-        </button>
-      </div>
     </Router>
   );
 }
