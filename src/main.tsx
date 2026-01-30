@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { AuthProvider } from './hooks/useAuth'
+import { AuthProvider } from "@/components/providers/AuthProvider";
 import App from './App.tsx'
 import './index.css'
 
