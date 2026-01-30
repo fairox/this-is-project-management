@@ -3,23 +3,6 @@ import {
   FileText, FileImage, FileCheck, FileSpreadsheet,
   FolderOpen, Clock, HardDrive, Download, Upload, Search
 } from "lucide-react";
-import {
-  DocumentsHeroCard,
-  RecentUploadsCard,
-  DocumentCategoriesCard,
-  DocumentTypeCard,
-  DocumentStatsCard,
-  StorageChartCard,
-} from "@/components/documents/bento";
-import {
-  TeamMemberCard,
-} from "@/components/projects/bento";
-
-import { AppLayout } from "@/components/AppLayout";
-import {
-  FileText, FileImage, FileCheck, FileSpreadsheet,
-  FolderOpen, Clock, HardDrive, Download, Upload, Search
-} from "lucide-react";
 import { useContracts } from "@/hooks/useContracts";
 import {
   DocumentsHeroCard,
@@ -40,7 +23,8 @@ const Documents = () => {
   const totalFiles = documents.length;
   const contractFiles = contracts.length; // Counting active contracts as "files" for the dashboard
   const drawingFiles = documents.filter(d => d.document_type === 'shop_drawing' || d.document_type === 'as_built').length;
-  const permitFiles = documents.filter(d => d.document_type === 'regulatory' || d.document_type === 'other').length; // Mapping 'other'/regulatory to permits for now
+  // Removed 'regulatory' since it varies by schema, sticking to verified types or 'other'
+  const permitFiles = documents.filter(d => d.document_type === 'other' || d.document_type === 'method_statement').length;
 
   // Mocking storage size since we don't have file size metadata in DB yet
   const estimatedSizeGB = Math.round((totalFiles * 2.5) + (contractFiles * 0.5)); // Approx 2.5MB per doc? Just visual mock.
@@ -83,7 +67,7 @@ const Documents = () => {
                 <div>
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-background/70">Estimated Storage</span>
-                    <span className="text-background font-medium">{estimatedSizeGB} MB</span>
+                    <span className="text-background font-medium">{estimatedSizeGB} GB</span>
                   </div>
                   <div className="h-3 bg-background/20 rounded-full overflow-hidden">
                     <div className="h-full w-[34%] bg-[hsl(65,70%,75%)] rounded-full" />
