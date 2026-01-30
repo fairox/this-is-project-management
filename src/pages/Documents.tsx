@@ -15,7 +15,40 @@ import {
   TeamMemberCard,
 } from "@/components/projects/bento";
 
+import { AppLayout } from "@/components/AppLayout";
+import {
+  FileText, FileImage, FileCheck, FileSpreadsheet,
+  FolderOpen, Clock, HardDrive, Download, Upload, Search
+} from "lucide-react";
+import { useContracts } from "@/hooks/useContracts";
+import {
+  DocumentsHeroCard,
+  RecentUploadsCard,
+  DocumentCategoriesCard,
+  DocumentTypeCard,
+  DocumentStatsCard,
+  StorageChartCard,
+} from "@/components/documents/bento";
+import {
+  TeamMemberCard,
+} from "@/components/projects/bento";
+
 const Documents = () => {
+  const { documents, contracts, loading } = useContracts();
+
+  // Aggregate stats
+  const totalFiles = documents.length;
+  const contractFiles = contracts.length; // Counting active contracts as "files" for the dashboard
+  const drawingFiles = documents.filter(d => d.document_type === 'shop_drawing' || d.document_type === 'as_built').length;
+  const permitFiles = documents.filter(d => d.document_type === 'regulatory' || d.document_type === 'other').length; // Mapping 'other'/regulatory to permits for now
+
+  // Mocking storage size since we don't have file size metadata in DB yet
+  const estimatedSizeGB = Math.round((totalFiles * 2.5) + (contractFiles * 0.5)); // Approx 2.5MB per doc? Just visual mock.
+
+  if (loading) {
+    return <AppLayout><div className="p-8">Loading documents...</div></AppLayout>;
+  }
+
   return (
     <AppLayout>
       <div className="container mx-auto p-6">
@@ -33,15 +66,15 @@ const Documents = () => {
             <div className="bg-foreground rounded-3xl p-8 h-full min-h-[320px] flex flex-col justify-between relative overflow-hidden">
               <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[hsl(65,70%,75%)]/20" />
               <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-[hsl(65,70%,75%)]/10" />
-              
+
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="h-14 w-14 rounded-2xl bg-[hsl(65,70%,75%)] flex items-center justify-center">
                     <FolderOpen className="h-7 w-7 text-foreground" />
                   </div>
                   <div>
-                    <p className="text-background/70 text-sm">Total Storage</p>
-                    <p className="text-background text-3xl font-bold">100 GB</p>
+                    <p className="text-background/70 text-sm">Total Files</p>
+                    <p className="text-background text-3xl font-bold">{totalFiles + contractFiles}</p>
                   </div>
                 </div>
               </div>
@@ -49,8 +82,8 @@ const Documents = () => {
               <div className="relative z-10 space-y-4">
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-background/70">Used</span>
-                    <span className="text-background font-medium">34 GB</span>
+                    <span className="text-background/70">Estimated Storage</span>
+                    <span className="text-background font-medium">{estimatedSizeGB} MB</span>
                   </div>
                   <div className="h-3 bg-background/20 rounded-full overflow-hidden">
                     <div className="h-full w-[34%] bg-[hsl(65,70%,75%)] rounded-full" />
@@ -83,17 +116,17 @@ const Documents = () => {
                   <span className="font-medium">Search</span>
                 </button>
               </div>
-              
+
               <div>
                 <p className="text-foreground/70 text-sm mb-2">Quick Stats</p>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-foreground/70 text-sm">This week</span>
-                    <span className="text-foreground font-bold">+23 files</span>
+                    <span className="text-foreground font-bold">+ {documents.filter(d => new Date(d.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-foreground/70 text-sm">Shared</span>
-                    <span className="text-foreground font-bold">48 files</span>
+                    <span className="text-foreground/70 text-sm">Submissions</span>
+                    <span className="text-foreground font-bold">{documents.length}</span>
                   </div>
                 </div>
               </div>
@@ -115,7 +148,7 @@ const Documents = () => {
           <div className="lg:col-span-2">
             <DocumentTypeCard
               title="Contracts"
-              count={24}
+              count={contractFiles}
               icon={FileCheck}
               variant="dark"
             />
@@ -124,7 +157,7 @@ const Documents = () => {
           <div className="lg:col-span-2">
             <DocumentTypeCard
               title="Drawings"
-              count={45}
+              count={drawingFiles}
               icon={FileImage}
               variant="accent"
             />
@@ -132,8 +165,8 @@ const Documents = () => {
 
           <div className="lg:col-span-2">
             <DocumentTypeCard
-              title="Permits"
-              count={18}
+              title="Permits / Other"
+              count={permitFiles}
               icon={FileSpreadsheet}
               variant="default"
             />
@@ -148,7 +181,7 @@ const Documents = () => {
             <DocumentStatsCard
               icon={FileText}
               label="Total Files"
-              value={156}
+              value={totalFiles + contractFiles}
               trend="+12"
               variant="accent"
             />
