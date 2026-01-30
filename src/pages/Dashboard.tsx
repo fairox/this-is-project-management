@@ -12,7 +12,35 @@ import {
   DashboardNavCard,
 } from "@/components/dashboard/bento";
 
+import { AppLayout } from "@/components/AppLayout";
+import { Building2, ClipboardCheck, FileText, ScrollText, Clock, Wrench, AlertTriangle, Users } from "lucide-react";
+import { useProjects } from "@/hooks/useProjects";
+import {
+  DashboardHeroCard,
+  DashboardMeetingsCard,
+  DashboardRoadmapCard,
+  DashboardQuickStatsCard,
+  DashboardDateCard,
+  DashboardEfficiencyCard,
+  DashboardTotalTimeCard,
+  DashboardTeamCard,
+  DashboardNavCard,
+} from "@/components/dashboard/bento";
+
 const Dashboard = () => {
+  const { projects, loading } = useProjects();
+
+  const activeProjects = projects.filter(p => p.status === 'active');
+  const onHoldProjects = projects.filter(p => p.status === 'on-hold');
+  const completedProjects = projects.filter(p => p.status === 'completed');
+
+  // Calculate generic "progress" or "value" if available (mocking value summation for now as it needs contracts)
+  // In a real scenario, we'd join with contracts to get the total value.
+
+  if (loading) {
+    return <AppLayout><div className="p-8">Loading dashboard...</div></AppLayout>;
+  }
+
   return (
     <AppLayout>
       <div className="container mx-auto p-6 space-y-6">
@@ -28,11 +56,11 @@ const Dashboard = () => {
           {/* Hero Card - spans 2 cols, 2 rows */}
           <div className="md:col-span-2 lg:col-span-2 lg:row-span-2">
             <DashboardHeroCard
-              companyName="Design X Threshold"
-              industry="Construction"
-              progress={34}
-              managerName="Sarah Chen"
-              managerRole="Project Manager"
+              companyName="Project Pact"
+              industry="Construction Management"
+              progress={65} // Placeholder average progress
+              managerName="Admin User"
+              managerRole="Project Director"
             />
           </div>
 
@@ -46,16 +74,16 @@ const Dashboard = () => {
             <DashboardQuickStatsCard
               icon={Building2}
               label="Active Projects"
-              value={12}
-              trend="+2"
+              value={activeProjects.length}
+              trend={activeProjects.length > 0 ? `+${activeProjects.length}` : "0"}
             />
           </div>
           <div>
             <DashboardQuickStatsCard
               icon={ClipboardCheck}
               label="Pending Inspections"
-              value={8}
-              trend="-3"
+              value={5} // Placeholder until we link inspections
+              trend="-1"
             />
           </div>
 
@@ -67,21 +95,21 @@ const Dashboard = () => {
 
           {/* Date + Efficiency Stack */}
           <div className="flex flex-col gap-4">
-            <DashboardDateCard day={19} weekday="Tue" month="January" />
-            <DashboardEfficiencyCard percentage={40} month="January" />
+            <DashboardDateCard day={new Date().getDate()} weekday={new Date().toLocaleDateString('en-US', { weekday: 'short' })} month={new Date().toLocaleDateString('en-US', { month: 'long' })} />
+            <DashboardEfficiencyCard percentage={85} month={new Date().toLocaleDateString('en-US', { month: 'long' })} />
           </div>
 
           {/* Total Time + Team Stack */}
           <div className="flex flex-col gap-4">
-            <DashboardTotalTimeCard hours={645} label="Total project time" />
-            <DashboardTeamCard name="Smart" role="Assistant" />
+            <DashboardTotalTimeCard hours={1240} label="Total project time" />
+            <DashboardTeamCard name="Smart" role="AI Assistant" />
           </div>
 
           {/* Row 3 - Navigation Cards */}
           <div>
             <DashboardNavCard
               title="Projects"
-              description="Manage all projects"
+              description={`${projects.length} Total Projects`}
               icon={Building2}
               link="/projects"
               variant="accent"
@@ -119,17 +147,17 @@ const Dashboard = () => {
           <div>
             <DashboardQuickStatsCard
               icon={AlertTriangle}
-              label="Risk Alerts"
-              value={4}
-              trend="-2"
+              label="On Hold / Risk"
+              value={onHoldProjects.length}
+              trend={onHoldProjects.length > 0 ? `+${onHoldProjects.length}` : "0"}
               accentColor
             />
           </div>
           <div>
             <DashboardQuickStatsCard
               icon={Users}
-              label="Team Members"
-              value={24}
+              label="Total Users"
+              value={8} // Placeholder
             />
           </div>
           <div>
